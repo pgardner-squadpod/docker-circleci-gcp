@@ -1,0 +1,53 @@
+version: 2.1
+jobs:
+  install-deps:
+    working_directory: ~/project
+    docker:
+      - image: node:16-alpine
+    steps:
+      - checkout
+      - run:
+          name: Update NPM
+          command: "sudo npm install -g npm"
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package-lock.json" }}
+      - run:
+          name: Install Dependencies
+          command: npm install
+      - save_cache:
+          key: dependency-cache-{{ checksum "package-lock.json" }}
+          paths:
+            - ./node_modules
+  unit-tests:
+    working_directory: ~/project
+    docker:
+      - image: node:16-alpine
+    steps:
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package-lock.json" }}
+      - run:
+          name: Test via react-scripts
+          command: npm run test
+  build:
+    working_directory: ~/project
+    docker:
+      - image: node:16-alpine
+    steps:
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package-lock.json" }}
+      - run:
+          name: Build via react-scripts
+          command: npm run build
+workflows:
+  lint-test-and-build:
+    jobs:
+      - install-deps
+      - unit-tests:
+          requires:
+            - install-deps
+      - build:
+          requires:
+            - install-deps
+            - unit-tests
