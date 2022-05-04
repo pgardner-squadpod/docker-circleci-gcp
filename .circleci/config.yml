@@ -6,6 +6,8 @@ jobs:
       - image: node:16-alpine
     steps:
       - checkout
+      - run: apt-get install -y sudo
+      - run: ls -al /bin/sh && sudo rm /bin/sh && sudo ln -s /bin/bash /bin/sh && ls -al /bin/sh
       - run:
           name: Update NPM
           command: "sudo npm install -g npm"
