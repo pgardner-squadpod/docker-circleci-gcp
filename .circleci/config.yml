@@ -42,6 +42,20 @@ jobs:
       - run:
           name: Build via react-scripts
           command: npm run build
+  publish:
+    working_directory: ~/project
+    docker:
+      - image: node:16-alpine
+    steps:
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package-lock.json" }}
+      - run:
+          name: Testing Publish Step
+          command: npm run hello
+    filters:
+      branches:
+        only: master
 workflows:
   lint-test-and-build:
     jobs:
@@ -53,3 +67,8 @@ workflows:
           requires:
             - install-deps
             - unit-tests
+      - publish:
+          requires:
+            - install-deps
+            - unit-tests
+            - build
