@@ -53,9 +53,6 @@ jobs:
       - run:
           name: Testing Publish Step
           command: npm run hello
-    filters:
-      branches:
-        only: master
 workflows:
   lint-test-and-build:
     jobs:
@@ -72,3 +69,6 @@ workflows:
             - install-deps
             - unit-tests
             - build
+          filters:
+            branches:
+              only: master
